@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --gray-color: #adb5bd;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 300px;
+            background-color: var(--light-color);
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .rooms-section {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-room-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .rooms-list {
+            list-style: none;
+        }
+
+        .room-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .room-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .room-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .room-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .room-name {
+            flex-grow: 1;
+        }
+
+        .room-users {
+            background-color: var(--gray-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .active .room-users {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        /* Main Chat Area */
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .current-room {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .room-actions button {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            font-size: 1.2rem;
+            margin-left: 15px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .room-actions button:hover {
+            color: var(--primary-color);
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            max-width: 80%;
+        }
+
+        .message.own {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            background-color: white;
+            padding: 12px 15px;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .own .message-content {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .message-sender {
+            font-weight: 600;
+        }
+
+        .message-time {
+            color: var(--gray-color);
+            font-size: 0.8rem;
+        }
+
+        .own .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-text {
+            line-height: 1.4;
+        }
+
+        .message-text a {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .own .message-text a {
+            color: white;
+        }
+
+        .message-text strong {
+            font-weight: 600;
+        }
+
+        .message-text em {
+            font-style: italic;
+        }
+
+        /* Message Input Area */
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 24px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .message-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .formatting-buttons {
+            display: flex;
+            margin: 0 15px;
+        }
+
+        .format-btn {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            font-size: 1.1rem;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .format-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Login Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar-header h2, .user-info span, .section-title span, .room-name, .room-users {
+                display: none;
+            }
+            
+            .section-title {
+                justify-content: center;
+            }
+            
+            .room-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .room-icon {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                height: 97vh;
+            }
+            
+            .sidebar {
+                position: absolute;
+                left: -300px;
+                z-index: 100;
+                height: 100%;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .formatting-buttons {
+                display: none;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Join Chat Application</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Choose a Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Join Chat</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Chat Rooms</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="usernameDisplay">User</span>
+                </div>
+            </div>
+            
+            <div class="rooms-section">
+                <div class="section-title">
+                    <span>Available Rooms</span>
+                    <button class="add-room-btn" id="addRoomBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <ul class="rooms-list" id="roomsList">
+                    <li class="room-item active" data-room="general">
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">General</span>
+                        <span class="room-users">12</span>
+                    </li>
+                    <li class="room-item" data-room="random">
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">Random</span>
+                        <span class="room-users">8</span>
+                    </li>
+                    <li class="room-item" data-room="tech">
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">Tech Talk</span>
+                        <span class="room-users">5</span>
+                    </li>
+                    <li class="room-item" data-room="gaming">
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">Gaming</span>
+                        <span class="room-users">15</span>
+                    </li>
+                    <li class="room-item" data-room="music">
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">Music Lovers</span>
+                        <span class="room-users">7</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="current-room" id="currentRoom">General</div>
+                <div class="room-actions">
+                    <button id="roomInfoBtn">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div class="message">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Alex</span>
+                            <span class="message-time">10:15 AM</span>
+                        </div>
+                        <div class="message-text">
+                            Hello everyone! Welcome to the General chat room.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">S</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Sam</span>
+                            <span class="message-time">10:16 AM</span>
+                        </div>
+                        <div class="message-text">
+                            Hi Alex! Glad to be here. How is everyone doing today?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message own">
+                    <div class="message-avatar" id="currentUserAvatar">U</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="message-time">10:17 AM</span>
+                        </div>
+                        <div class="message-text">
+                            I'm doing great! Just joined this chat application. It looks amazing!
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">J</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Jordan</span>
+                            <span class="message-time">10:18 AM</span>
+                        </div>
+                        <div class="message-text">
+                            Welcome <strong>User</strong>! We're happy to have you here. Feel free to ask any questions.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Morgan</span>
+                            <span class="message-time">10:20 AM</span>
+                        </div>
+                        <div class="message-text">
+                            Check out this cool website I found: <a href="https://unifiedmentor.com" target="_blank">Unified Mentor</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message own">
+                    <div class="message-avatar" id="currentUserAvatar2">U</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="message-time">10:22 AM</span>
+                        </div>
+                        <div class="message-text">
+                            Thanks <em>Jordan</em>! I'll definitely check out that website, Morgan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <button class="mobile-menu-btn" id="mobileMenuBtn2">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <input type="text" class="message-input" id="messageInput" placeholder="Type your message...">
+                <div class="formatting-buttons">
+                    <button class="format-btn" id="boldBtn" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button class="format-btn" id="italicBtn" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button class="format-btn" id="linkBtn" title="Insert Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        const currentUserAvatar = document.getElementById('currentUserAvatar');
+        const currentUserAvatar2 = document.getElementById('currentUserAvatar2');
+        const roomsList = document.getElementById('roomsList');
+        const roomItems = document.querySelectorAll('.room-item');
+        const currentRoom = document.getElementById('currentRoom');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const boldBtn = document.getElementById('boldBtn');
+        const italicBtn = document.getElementById('italicBtn');
+        const linkBtn = document.getElementById('linkBtn');
+        const addRoomBtn = document.getElementById('addRoomBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenuBtn2 = document.getElementById('mobileMenuBtn2');
+        const sidebar = document.getElementById('sidebar');
+
+        // Show login modal on page load
+        window.addEventListener('load', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            
+            if (username) {
+                // Set username and avatar
+                usernameDisplay.textContent = username;
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+                currentUserAvatar.textContent = username.charAt(0).toUpperCase();
+                currentUserAvatar2.textContent = username.charAt(0).toUpperCase();
+                
+                // Hide login modal
+                loginModal.style.display = 'none';
+                
+                // Auto-scroll to bottom of messages
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        });
+
+        // Handle room selection
+        roomItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all rooms
+                roomItems.forEach(room => room.classList.remove('active'));
+                
+                // Add active class to clicked room
+                item.classList.add('active');
+                
+                // Update current room name
+                currentRoom.textContent = item.querySelector('.room-name').textContent;
+                
+                // In a real app, you would load messages for the selected room here
+                
+                // Close mobile sidebar if open
+                if (window.innerWidth <= 576) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle sending messages
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                // Create new message element
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'own');
+                
+                const now = new Date();
+                const timeString = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+                
+                messageElement.innerHTML = `
+                    <div class="message-avatar">${usernameDisplay.textContent.charAt(0)}</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">You</span>
+                            <span class="message-time">${timeString}</span>
+                        </div>
+                        <div class="message-text">${formatMessage(message)}</div>
+                    </div>
+                `;
+                
+                // Add message to container
+                messagesContainer.appendChild(messageElement);
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        // Format message text (basic implementation)
+        function formatMessage(text) {
+            // Simple formatting - in a real app, you'd use a more robust solution
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+        }
+
+        // Send message on button click
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Send message on Enter key (but allow Shift+Enter for new line)
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Formatting buttons
+        boldBtn.addEventListener('click', () => {
+            wrapSelection('**', '**');
+        });
+
+        italicBtn.addEventListener('click', () => {
+            wrapSelection('*', '*');
+        });
+
+        linkBtn.addEventListener('click', () => {
+            const url = prompt('Enter URL:');
+            if (url) {
+                wrapSelection('[', `](${url})`);
+            }
+        });
+
+        // Helper function to wrap selected text with formatting
+        function wrapSelection(before, after) {
+            const start = messageInput.selectionStart;
+            const end = messageInput.selectionEnd;
+            const selectedText = messageInput.value.substring(start, end);
+            const newText = messageInput.value.substring(0, start) + before + selectedText + after + messageInput.value.substring(end);
+            messageInput.value = newText;
+            messageInput.focus();
+            messageInput.setSelectionRange(start + before.length, end + before.length);
+        }
+
+        // Add new room
+        addRoomBtn.addEventListener('click', () => {
+            const roomName = prompt('Enter new room name:');
+            if (roomName && roomName.trim()) {
+                const newRoom = document.createElement('li');
+                newRoom.classList.add('room-item');
+                newRoom.setAttribute('data-room', roomName.toLowerCase().replace(/\s+/g, '-'));
+                
+                newRoom.innerHTML = `
+                    <i class="fas fa-hashtag room-icon"></i>
+                    <span class="room-name">${roomName}</span>
+                    <span class="room-users">0</span>
+                `;
+                
+                roomsList.appendChild(newRoom);
+                
+                // Add event listener to the new room
+                newRoom.addEventListener('click', () => {
+                    roomItems.forEach(room => room.classList.remove('active'));
+                    newRoom.classList.add('active');
+                    currentRoom.textContent = roomName;
+                    
+                    // In a real app, you would load messages for the new room here
+                    
+                    // Close mobile sidebar if open
+                    if (window.innerWidth <= 576) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        mobileMenuBtn2.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 576 && 
+                !sidebar.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target) && 
+                !mobileMenuBtn2.contains(e.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 576) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

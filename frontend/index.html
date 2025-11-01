@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Join Chat Application</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Choose a Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter your username" required maxlength="20">
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="roomSelect">Select Room</label>
+                    <select id="roomSelect" class="form-control">
+                        <option value="general">General</option>
+                        <option value="random">Random</option>
+                        <option value="tech">Tech Talk</option>
+                        <option value="gaming">Gaming</option>
+                        <option value="music">Music Lovers</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" id="joinBtn">
+                    <i class="fas fa-sign-in-alt"></i> Join Chat
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Chat Rooms</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="usernameDisplay">User</span>
+                </div>
+            </div>
+            
+            <div class="rooms-section">
+                <div class="section-title">
+                    <span>Available Rooms</span>
+                    <button class="add-room-btn" id="addRoomBtn" title="Create New Room">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <ul class="rooms-list" id="roomsList">
+                    <!-- Rooms will be populated by JavaScript -->
+                </ul>
+            </div>
+
+            <div class="online-users">
+                <div class="section-title">
+                    <span>Online Users</span>
+                    <span class="user-count" id="userCount">0</span>
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Users will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="room-info">
+                    <div class="current-room" id="currentRoom">General</div>
+                    <div class="typing-indicator" id="typingIndicator"></div>
+                </div>
+                <div class="room-actions">
+                    <button id="roomInfoBtn" title="Room Info">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button id="notificationsBtn" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button id="logoutBtn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <i class="fas fa-comments"></i>
+                    <h3>Welcome to the Chat!</h3>
+                    <p>Start chatting with other users in the room.</p>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <button class="mobile-menu-btn" id="mobileMenuBtn2">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="input-wrapper">
+                    <textarea class="message-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                    <div class="formatting-buttons">
+                        <button class="format-btn" id="boldBtn" title="Bold (Ctrl+B)">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="format-btn" id="italicBtn" title="Italic (Ctrl+I)">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="format-btn" id="linkBtn" title="Insert Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="send-btn" id="sendBtn" title="Send Message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Creation Modal -->
+    <div class="modal" id="roomModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Room</h2>
+                <button class="close-btn" id="closeRoomModal">&times;</button>
+            </div>
+            <form id="roomForm">
+                <div class="form-group">
+                    <label for="roomName">Room Name</label>
+                    <input type="text" id="roomName" class="form-control" placeholder="Enter room name" required maxlength="30">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Room
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -6,11 +6,17 @@ A full-stack real-time chat application built with Node.js, Express, Socket.io, 
 
 🚀 Features
 ✅ Real-time messaging with WebSockets
+
 ✅ Multiple chat rooms with room creation
+
 ✅ User authentication with unique usernames
+
 ✅ Online users list
+
 ✅ Typing indicators
+
 ✅ Message formatting (bold, italics, links)
+
 ✅ Responsive design for mobile and desktop
 
 🛠️ Technology Stack
